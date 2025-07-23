@@ -1,14 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>시흥에코센터 - 환경 데이터 대시보드</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+    <div class="bg-animation"></div>
     
-</body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">시흥에코센터</div>
+            </div>
+            <div class="header-info">
+                <div>환경 데이터 대시보드</div>
+                <div>실시간 환경 영향도 분석</div>
+            </div>
+        </div>
+    </header>
 
+    <div class="container">
+        <div class="title">
+            <h1>🌍 환경 영향도 시각화</h1>
+            <p>개인부터 국가 단위까지 환경 데이터를 한눈에</p>
+        </div>
+
+        <div class="grid">
+            <!-- 이산화탄소 배출량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🏭</span>
+                    <h3 class="card-title">이산화탄소 배출량</h3>
+                    <p class="card-subtitle">CO₂ Emissions (kg/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="co2" data-scale="1">1인</div>
+                    <div class="tab" data-card="co2" data-scale="100">100인</div>
+                    <div class="tab" data-card="co2" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="co2" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="co2Chart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="co2Total">4,500kg</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>월평균:</span>
+                        <span class="stats-value" id="co2Monthly">375kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탄소발자국 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">👣</span>
+                    <h3 class="card-title">탄소발자국</h3>
+                    <p class="card-subtitle">Carbon Footprint (tCO₂eq/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="carbon" data-scale="1">1인</div>
+                    <div class="tab" data-card="carbon" data-scale="100">100인</div>
+                    <div class="tab" data-card="carbon" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="carbon" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="carbonChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="carbonTotal">12.5t</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>세계 평균 대비:</span>
+                        <span class="stats-value" id="carbonCompare">+23%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 에너지 소비량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h3 class="card-title">에너지 소비량</h3>
+                    <p class="card-subtitle">Energy Consumption (MWh/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="energy" data-scale="1">1인</div>
+                    <div class="tab" data-card="energy" data-scale="100">100인</div>
+                    <div class="tab" data-card="energy" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="energy" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="energyChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="energyTotal">8.2 MWh</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>재생에너지 비율:</span>
+                        <span class="stats-value" id="renewableRatio">6.2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 물 사용량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">💧</span>
+                    <h3 class="card-title">물 사용량</h3>
+                    <p class="card-subtitle">Water Usage (m³/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="water" data-scale="1">1인</div>
+                    <div class="tab" data-card="water" data-scale="100">100인</div>
+                    <div class="tab" data-card="water" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="water" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="waterChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="waterTotal">186 m³</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>일평균:</span>
+                        <span class="stats-value" id="waterDaily">510L</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
