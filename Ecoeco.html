@@ -5,15 +5,19 @@
     <meta charset="UTF-8">
     <title>Ecoeco</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style> body { max-width: 800px; margin: 30px auto; font-family: Arial, sans-serif; } </style>
+    <style>
+        body { max-width: 800px; margin: 30px auto; font-family: Arial, sans-serif; }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    </style>
 </head>
 
 <body>
     <h1>CO2 총 배출량 및 예측 (1990~2100)</h1>
 
     <label>매년 늘어날 12그루 이상 나무를 심는 사람 수:</label>
-    <input type="number" id="addTreePlanters" value="0" min="0">
-    <button onclick="updateChart()">업데이트</button>
+    <input type="number" id="addTreePlanters" value="0" min="0" onkeydown="if(event.key === 'Enter') updateCO2Chart()">
+    <button onclick="updateCO2Chart()">업데이트</button>
 
     <br>
     총 참여자 수: <output id="totalPeople">0</output> 명
@@ -49,6 +53,7 @@
             return result.trim();
         }
 
+        // - - - 나무심기 차트 - - - //
         const CO2 = {
             1990: 256216.0082,  1991: 286190.9877,  1992: 310353.5165,  1993: 347747.4906,  1994: 372197.7143,
             1995: 401672.0912,  1996: 437066.4251,  1997: 457947.2808,  1998: 395004.0749,  1999: 430541.9621,
@@ -85,7 +90,7 @@
         
         let chart;
 
-        function updateChart() {
+        function updateCO2Chart() {
             const peoplePerYear = parseInt(document.getElementById("addTreePlanters").value);
             const treesPerPersonPerYear = 12;
             // const absorptionPerTree = 0.00002177;
@@ -199,7 +204,7 @@
         }
 
         // 초기 실행
-        updateChart();
+        updateCO2Chart();
     </script>
 </body>
 
