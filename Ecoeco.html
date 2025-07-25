@@ -1,14 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Ecoeco</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style> body { max-width: 800px; margin: 30px auto; font-family: Arial, sans-serif; } </style>
 </head>
 
 <body>
-    
+    <h1>CO2 총 배출량 및 예측 (1990~2100)</h1>
+
+    <label>매년 늘어날 12그루 이상 나무를 심는 사람 수:</label>
+    <input type="number" id="addTreePlanters" value="0" min="0">
+    <button onclick="updateChart()">업데이트</button>
+
+    <br>
+    총 참여자 수: <output id="totalPeople">0</output> 명
+    <br>
+    총 심은 나무 수: <output id="totalTrees">0</output> 그루
+    <br>
+    총 CO2 흡수량: <output id="totalAbsorbed">0</output> kg
+
+    <canvas id="CO2Chart" width="800" height="400"></canvas>
+
+    <script>
+        function formatNumberKR(num) {
+            if (num === 0) return "0";
+            
+            const units = [
+                { value: 1e12, symbol: "조" },
+                { value: 1e8, symbol: "억" },
+                { value: 1e4, symbol: "만" },
+                { value: 1e3, symbol: "천" }
+            ];
+            
+            let result = "";
+            let remainder = Math.floor(num);
+            
+            for (const unit of units) {
+                const count = Math.floor(remainder / unit.value);
+                remainder = remainder % unit.value;
+                if (count > 0) result += count + unit.symbol + " ";
+            }
+            
+            if (remainder > 0) result += remainder.toLocaleString();
+
+            return result.trim();
+        }
+
+        const CO2 = {
+            1990: 256216.0082,  1991: 286190.9877,  1992: 310353.5165,  1993: 347747.4906,  1994: 372197.7143,
+            1995: 401672.0912,  1996: 437066.4251,  1997: 457947.2808,  1998: 395004.0749,  1999: 430541.9621,
+            2000: 462622.8978,  2001: 482256.2347,  2002: 500515.3671,  2003: 512504.2544,  2004: 521860.6475,
+            2005: 521261.4242,  2006: 533407.9104,  2007: 546650.8555,  2008: 561050.6401,  2009: 564255.153,
+            2010: 618047.3769,  2011: 652029.5269,  2012: 648655.6184,  2013: 654661.8371,  2014: 647520.0963,
+            2015: 651088.8338,  2016: 661823.1395,  2017: 679647.0103,  2018: 701069.2609,  2019: 675177.4041,
+            2020: 626722.3281,  2021: 652481.1457,  2022: 635818.4417
+        };
+
+        const years = Object.keys(CO2).map(Number);
+        // const values = years.map(y => CO2[y]);
+           const values = years.map(y => CO2[y] * 1e6);
+        
+        function linearRegression(x, y) {
+            const n = x.length;
+            let sumX = 0
+            let sumY = 0
+            let sumXY = 0
+            let sumX2 = 0;
+            
+            for(let i = 0; i < n; i++) {
+                sumX += x[i];
+                sumY += y[i];
+                sumXY += x[i] * y[i];
+                sumX2 += x[i] * x[i];
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            return { slope, intercept };
+        }
+        
+        let chart;
+
+        function updateChart() {
+            const peoplePerYear = parseInt(document.getElementById("addTreePlanters").value);
+            const treesPerPersonPerYear = 12;
+            // const absorptionPerTree = 0.00002177;
+               const absorptionPerTree = 0.00002177 * 1e6;
+            const { slope, intercept } = linearRegression(years, values);
+
+            const forecastYears = [];
+            const forecastValues = [];
+            const cumulativeAbsorption = [];
+
+            let totalPeople = 0;
+            let totalTrees = 0;
+            let totalAbsorbed = 0;
+            const peopleGatheredThisYear = {};
+            const treesPlantedByYear = {};
+
+            for (let y = 2023; y <= 2100; y++) {
+                // 올해 참여자 수
+                let peopleThisYear = (y - 2023 + 1) * peoplePerYear
+                if (y == 2100) totalPeople = peopleThisYear
+
+                // 올해 심은 나무 수
+                treesPlantedByYear[y] = peopleThisYear * treesPerPersonPerYear;
+                totalTrees += treesPlantedByYear[y];
+
+                // 누적 CO2 흡수량
+                let absorbedThisYear = 0;
+                for (let plantedYear = 2023; plantedYear <= y; plantedYear++) absorbedThisYear += treesPlantedByYear[plantedYear] * absorptionPerTree;
+                totalAbsorbed = absorbedThisYear;
+
+                const projected = slope * y + intercept;
+                forecastYears.push(y);
+                forecastValues.push(Math.max(projected - totalAbsorbed, 0));
+                cumulativeAbsorption.push(totalAbsorbed);
+            }
+
+            document.getElementById("totalPeople").textContent = formatNumberKR(totalPeople);
+            document.getElementById("totalTrees").textContent = formatNumberKR(totalTrees);
+            document.getElementById("totalAbsorbed").textContent = formatNumberKR(totalAbsorbed);
+
+            const allYears = years.concat(forecastYears);
+            const forecastWithOffset = forecastValues;
+
+            const ctx = document.getElementById("CO2Chart").getContext("2d");
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: "line",
+
+                data: {
+                    labels: allYears,
+
+                    datasets: [
+                        {
+                            label: "실제 CO2 배출량",
+                            data: values,
+                            borderColor: "blue",
+                            backgroundColor: "rgba(0, 0, 255, 0.1)",
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0
+                        },
+                        {
+                            label: "예측 CO2 배출량 (탄소 흡수 반영)",
+                            data: values.concat(forecastWithOffset),
+                            borderColor: "green",
+                            backgroundColor: "rgba(0, 128, 0, 0.1)",
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    interaction: { mode: "index", intersect: false },
+
+                    scales: {
+                        x: {
+                            title: { display: true, text: "연도" },
+                            ticks: { maxTicksLimit: 20 }
+                        },
+                        y: {
+                            title: { display: true, text: "총 배출량 (kg CO₂-eq)" },
+                            beginAtZero: true,
+                            max: 1800000000000,
+                            min: 0,
+                            ticks: { callback: function(value) { return formatNumberKR(value); } }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: "top" },
+                        title: { display: false },
+                        tooltip: {
+                            filter: function(tooltipItem) { return !(tooltipItem.datasetIndex === 1 && chart.data.labels[tooltipItem.dataIndex] <= 2022); },
+                            
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y || 0;
+                                    return label + ": " + formatNumberKR(Math.round(value)) + " kg";
+                                }
+                            }
+                        }
+                    }
+                }
+            } );
+        }
+
+        // 초기 실행
+        updateChart();
+    </script>
 </body>
 
 </html>
