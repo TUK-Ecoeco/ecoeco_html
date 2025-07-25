@@ -13,20 +13,35 @@
 </head>
 
 <body>
-    <h1>CO2 총 배출량 및 예측 (1990~2100)</h1>
+    <div style="display: flex; gap: 40px; margin: 20px auto; justify-content: center; flex-wrap: wrap;">
+        <div style="flex: 1;">
+            <h1>CO2 총 배출량 및 나무심기 예측 (1990~2100)</h1>
 
-    <label>매년 늘어날 12그루 이상 나무를 심는 사람 수:</label>
-    <input type="number" id="addTreePlanters" value="0" min="0" onkeydown="if(event.key === 'Enter') updateCO2Chart()">
-    <button onclick="updateCO2Chart()">업데이트</button>
+            <label>매년 늘어날 12그루 이상 나무를 심는 사람 수:</label>
+            <input type="number" id="addTreePlanters" min="0" onkeydown="if(event.key === 'Enter') updateCO2Chart()" style="margin-right: 5px;">
+            <button onclick="updateCO2Chart()">업데이트</button> <br>
 
-    <br>
-    총 참여자 수: <output id="totalPeople">0</output> 명
-    <br>
-    총 심은 나무 수: <output id="totalTrees">0</output> 그루
-    <br>
-    총 CO2 흡수량: <output id="totalAbsorbed">0</output> kg
+            총 참여자 수: <output id="totalPeople">0</output> 명 <br>
+            총 심은 나무 수: <output id="totalTrees">0</output> 그루 <br>
+            총 CO2 흡수량: <output id="totalAbsorbed">0</output> kg <br>
 
-    <canvas id="CO2Chart" width="800" height="400"></canvas>
+            <canvas id="CO2Chart" width="1000" height="300"></canvas>
+        </div>
+
+        <div style="flex: 1;">
+            <h1>CO2 총 배출량 및 탄소발자국 줄이기 실천 예측 (1990~2100)</h1>
+
+            <label>매년 늘어날 하루 1번 탄소발자국 줄이기 실천하는 사람 수:</label>
+            <input type="number" id="addCarbonReducer" min="0" onkeydown="if(event.key === 'Enter') updateCarbonFootprintChart()" style="margin-right: 5px;">
+            <button onclick="updateCarbonFootprintChart()">업데이트</button> <br>
+
+            총 참여자 수: <output id="totalReducePeople">0</output> 명 <br>
+            총 실천 수: <output id="totalReduceActions">0</output> 회 <br>
+            총 탄소 감소량: <output id="totalReduceCO2">0</output> kg <br>
+
+            <canvas id="CarbonFootprintChart" width="1000" height="300"></canvas>
+        </div>
+    </div>
 
     <script>
         function formatNumberKR(num) {
@@ -88,13 +103,12 @@
             return { slope, intercept };
         }
         
-        let chart;
+        let CO2Chart;
 
         function updateCO2Chart() {
-            const peoplePerYear = parseInt(document.getElementById("addTreePlanters").value);
+            const peoplePerYear = Math.max(0, parseInt(document.getElementById("addTreePlanters").value) || 0);
             const treesPerPersonPerYear = 12;
-            // const absorptionPerTree = 0.00002177;
-               const absorptionPerTree = 0.00002177 * 1e6;
+            const absorptionPerTree = 21.77;
             const { slope, intercept } = linearRegression(years, values);
 
             const forecastYears = [];
@@ -104,8 +118,7 @@
             let totalPeople = 0;
             let totalTrees = 0;
             let totalAbsorbed = 0;
-            const peopleGatheredThisYear = {};
-            const treesPlantedByYear = {};
+            const treesByYear = {};
 
             for (let y = 2023; y <= 2100; y++) {
                 // 올해 참여자 수
@@ -113,12 +126,12 @@
                 if (y == 2100) totalPeople = peopleThisYear
 
                 // 올해 심은 나무 수
-                treesPlantedByYear[y] = peopleThisYear * treesPerPersonPerYear;
-                totalTrees += treesPlantedByYear[y];
+                treesByYear[y] = peopleThisYear * treesPerPersonPerYear;
+                totalTrees += treesByYear[y];
 
                 // 누적 CO2 흡수량
                 let absorbedThisYear = 0;
-                for (let plantedYear = 2023; plantedYear <= y; plantedYear++) absorbedThisYear += treesPlantedByYear[plantedYear] * absorptionPerTree;
+                for (let plantedYear = 2023; plantedYear <= y; plantedYear++) absorbedThisYear += treesByYear[plantedYear] * absorptionPerTree;
                 totalAbsorbed = absorbedThisYear;
 
                 const projected = slope * y + intercept;
@@ -136,9 +149,9 @@
 
             const ctx = document.getElementById("CO2Chart").getContext("2d");
 
-            if (chart) chart.destroy();
+            if (CO2Chart) CO2Chart.destroy();
 
-            chart = new Chart(ctx, {
+            CO2Chart = new Chart(ctx, {
                 type: "line",
 
                 data: {
@@ -154,6 +167,7 @@
                             tension: 0.1,
                             pointRadius: 0
                         },
+
                         {
                             label: "예측 CO2 배출량 (탄소 흡수 반영)",
                             data: values.concat(forecastWithOffset),
@@ -174,21 +188,139 @@
                     scales: {
                         x: {
                             title: { display: true, text: "연도" },
-                            ticks: { maxTicksLimit: 20 }
+                            ticks: { maxTicksLimit: 12 }
                         },
+
                         y: {
                             title: { display: true, text: "총 배출량 (kg CO₂-eq)" },
-                            beginAtZero: true,
-                            max: 1800000000000,
-                            min: 0,
-                            ticks: { callback: function(value) { return formatNumberKR(value); } }
+                            ticks: { callback: function(value) { return formatNumberKR(value); } },
+                            max: 1800000000000, min: 0
                         }
                     },
+
                     plugins: {
                         legend: { position: "top" },
+
                         title: { display: false },
+
                         tooltip: {
-                            filter: function(tooltipItem) { return !(tooltipItem.datasetIndex === 1 && chart.data.labels[tooltipItem.dataIndex] <= 2022); },
+                            filter: function(tooltipItem) { return !(tooltipItem.datasetIndex === 1 && CO2Chart.data.labels[tooltipItem.dataIndex] <= 2022); },
+                            
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y || 0;
+                                    return label + ": " + formatNumberKR(Math.round(value)) + " kg";
+                                }
+                            }
+                        }
+                    }
+                }
+            } );
+        }
+
+        let CarbonFootprintChart;
+
+        function updateCarbonFootprintChart() {
+            const peoplePerYear = Math.max(0, parseInt(document.getElementById("addCarbonReducer").value) || 0);
+            const actionsPerPersonPerYear = 365;
+            const reductionPerAction = 0.7;
+            const { slope, intercept } = linearRegression(years, values);
+
+            const forecastYears = [];
+            const forecastValues = [];
+            const cumulativeAbsorption = [];
+
+            let totalReducePeople = 0;
+            let totalReduceActions = 0;
+            let totalReduceCO2 = 0;
+            const actionsByYear = {};
+
+            for (let y = 2023; y <= 2100; y++) {
+                // 올해 참여자 수
+                let peopleThisYear = (y - 2023 + 1) * peoplePerYear
+                if (y == 2100) totalReducePeople = peopleThisYear
+
+                // 올해 실천 수
+                actionsByYear[y] = peopleThisYear * actionsPerPersonPerYear;
+                totalReduceActions += actionsByYear[y];
+
+                // 누적 CO2 흡수량
+                let reducedThisYear = 0;
+                for (let actionedYear = 2023; actionedYear <= y; actionedYear++) reducedThisYear += actionsByYear[actionedYear] * reductionPerAction;
+                totalReduceCO2 = reducedThisYear;
+
+                const projected = slope * y + intercept;
+                forecastYears.push(y);
+                forecastValues.push(Math.max(projected - totalReduceCO2, 0));
+                cumulativeAbsorption.push(totalReduceCO2);
+            }
+
+            document.getElementById("totalReducePeople").textContent = formatNumberKR(totalReducePeople);
+            document.getElementById("totalReduceActions").textContent = formatNumberKR(totalReduceActions);
+            document.getElementById("totalReduceCO2").textContent = formatNumberKR(totalReduceCO2);
+
+            const allYears = years.concat(forecastYears);
+            const forecastWithOffset = forecastValues;
+
+            const ctx = document.getElementById("CarbonFootprintChart").getContext("2d");
+
+            if (CarbonFootprintChart) CarbonFootprintChart.destroy();
+
+            CarbonFootprintChart = new Chart(ctx, {
+                type: "line",
+
+                data: {
+                    labels: allYears,
+
+                    datasets: [
+                        {
+                            label: "실제 CO2 배출량",
+                            data: values,
+                            borderColor: "blue",
+                            backgroundColor: "rgba(0, 0, 255, 0.1)",
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0
+                        },
+
+                        {
+                            label: "예측 CO2 배출량 (탄소 흡수 반영)",
+                            data: values.concat(forecastWithOffset),
+                            borderColor: "green",
+                            backgroundColor: "rgba(0, 128, 0, 0.1)",
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    interaction: { mode: "index", intersect: false },
+
+                    scales: {
+                        x: {
+                            title: { display: true, text: "연도" },
+                            ticks: { maxTicksLimit: 12 }
+                        },
+
+                        y: {
+                            title: { display: true, text: "총 배출량 (kg CO₂-eq)" },
+                            ticks: { callback: function(value) { return formatNumberKR(value); } },
+                            max: 1800000000000, min: 0
+                        }
+                    },
+
+                    plugins: {
+                        legend: { position: "top" },
+
+                        title: { display: false },
+
+                        tooltip: {
+                            filter: function(tooltipItem) { return !(tooltipItem.datasetIndex === 1 && CarbonFootprintChart.data.labels[tooltipItem.dataIndex] <= 2022); },
                             
                             callbacks: {
                                 label: function(context) {
@@ -205,6 +337,7 @@
 
         // 초기 실행
         updateCO2Chart();
+        updateCarbonFootprintChart();
     </script>
 </body>
 
