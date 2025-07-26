@@ -29,15 +29,15 @@
         </div>
 
         <div style="flex: 1;">
-            <h1>CO2 총 배출량 및 탄소발자국 줄이기 실천 예측 (1990~2100)</h1>
+            <h1>CO2 총 배출량 및 일회용품 안 쓰기 실천 예측 (1990~2100)</h1>
 
-            <label>매년 늘어날 하루 1번 탄소발자국 줄이기 실천하는 사람 수:</label>
+            <label>매년 늘어날 일회용품 안 쓰기 실천하는 사람 수:</label>
             <input type="number" id="addCarbonReducer" min="0" onkeydown="if(event.key === 'Enter') updateCarbonFootprintChart()" style="margin-right: 5px;">
             <button onclick="updateCarbonFootprintChart()">업데이트</button> <br>
 
             총 참여자 수: <output id="totalReducePeople">0</output> 명 <br>
             총 실천 수: <output id="totalReduceActions">0</output> 회 <br>
-            총 탄소 감소량: <output id="totalReduceCO2">0</output> kg <br>
+            총 CO2 감소량: <output id="totalReduceCO2">0</output> kg <br>
 
             <canvas id="CarbonFootprintChart" width="1000" height="300"></canvas>
         </div>
@@ -67,21 +67,6 @@
 
             return result.trim();
         }
-
-        // - - - 나무심기 차트 - - - //
-        const CO2 = {
-            1990: 256216.0082,  1991: 286190.9877,  1992: 310353.5165,  1993: 347747.4906,  1994: 372197.7143,
-            1995: 401672.0912,  1996: 437066.4251,  1997: 457947.2808,  1998: 395004.0749,  1999: 430541.9621,
-            2000: 462622.8978,  2001: 482256.2347,  2002: 500515.3671,  2003: 512504.2544,  2004: 521860.6475,
-            2005: 521261.4242,  2006: 533407.9104,  2007: 546650.8555,  2008: 561050.6401,  2009: 564255.153,
-            2010: 618047.3769,  2011: 652029.5269,  2012: 648655.6184,  2013: 654661.8371,  2014: 647520.0963,
-            2015: 651088.8338,  2016: 661823.1395,  2017: 679647.0103,  2018: 701069.2609,  2019: 675177.4041,
-            2020: 626722.3281,  2021: 652481.1457,  2022: 635818.4417
-        };
-
-        const years = Object.keys(CO2).map(Number);
-        // const values = years.map(y => CO2[y]);
-           const values = years.map(y => CO2[y] * 1e6);
         
         function linearRegression(x, y) {
             const n = x.length;
@@ -102,13 +87,27 @@
             
             return { slope, intercept };
         }
+
+        const CO2 = {
+            1990: 256216.0082,  1991: 286190.9877,  1992: 310353.5165,  1993: 347747.4906,  1994: 372197.7143,
+            1995: 401672.0912,  1996: 437066.4251,  1997: 457947.2808,  1998: 395004.0749,  1999: 430541.9621,
+            2000: 462622.8978,  2001: 482256.2347,  2002: 500515.3671,  2003: 512504.2544,  2004: 521860.6475,
+            2005: 521261.4242,  2006: 533407.9104,  2007: 546650.8555,  2008: 561050.6401,  2009: 564255.153,
+            2010: 618047.3769,  2011: 652029.5269,  2012: 648655.6184,  2013: 654661.8371,  2014: 647520.0963,
+            2015: 651088.8338,  2016: 661823.1395,  2017: 679647.0103,  2018: 701069.2609,  2019: 675177.4041,
+            2020: 626722.3281,  2021: 652481.1457,  2022: 635818.4417
+        };
+        const years = Object.keys(CO2).map(Number);     // 데이터 = https://www.data.go.kr/data/15070396/fileData.do
+
+        const values = years.map(y => CO2[y] * 1e6);    // 1kt = 1,000,000kg (1e6) 변환
         
+        // - - - 나무심기 차트 - - - //
         let CO2Chart;
 
         function updateCO2Chart() {
             const peoplePerYear = Math.max(0, parseInt(document.getElementById("addTreePlanters").value) || 0);
-            const treesPerPersonPerYear = 12;
-            const absorptionPerTree = 21.77;
+            const treesPerPersonPerYear = 12;   // 한 달에 1그루씩 심는다.
+            const absorptionPerTree = 21.77;    // 1그루는 연간 21.77kg CO2를 흡수한다. (링크 조사 필요)
             const { slope, intercept } = linearRegression(years, values);
 
             const forecastYears = [];
@@ -219,12 +218,28 @@
             } );
         }
 
+        // - - - 일회용품 안 쓰기 차트 - - - //
         let CarbonFootprintChart;
 
         function updateCarbonFootprintChart() {
             const peoplePerYear = Math.max(0, parseInt(document.getElementById("addCarbonReducer").value) || 0);
-            const actionsPerPersonPerYear = 365;
-            const reductionPerAction = 0.7;
+            const actionsPerPersonPerYear = 1;  // 1년을 통틀어 계산한다.
+            const reductionPerAction = 69;      // 아래 문헌 참조
+//          KR 한국 기준 통계 기반 (https://www.researchgate.net/publication/340245695_Recycling_and_management_practices_of_plastic_packaging_waste_towards_a_circular_economy_in_South_Korea)
+
+//          한국은 1인당 연간 약 638개의 일회용 플라스틱 제품(PET병, 컵, 비닐봉투, 용기, 수저류 등)을 사용하며, 연간 약 11.8 kg의 무게에 해당
+
+//          플라스틱 1kg 제조 시 CO₂ 배출량 LCA(Life Cycle Assessment) 기준 평균 1kg당 약 2.5kg ~ 6.0kg CO₂eq (재질/공정에 따라)
+
+//          1인당 1년간 사용하는 일회용품(11.8kg)을 만드는 데 드는 CO₂는 약 30kg(11.8 x 2.5 = 29.5) ~ 70kg(11.8 x 6.0 = 70.8) CO₂eq 평균값 기준 약 50kg CO₂eq
+
+//          플라스틱 소각 시 CO₂ 배출량 플라스틱 종류별 평균 1kg 소각 시 약 2.9kg CO₂eq 발생 (출처: IPCC, KMOE 환경부 LCI DB)
+
+//          한국의 생활 폐기물 중 플라스틱 재활용률은 약 40% ~ 50% 수준 그러므로 실제 소각되는 비율은 대략 50% ~ 60%로 추정
+
+//          11.8kg (연간 플라스틱량) × 2.9kg CO₂eq/kg (소각계수) x 0.55 (소각되는 양 비율) ≈ 약 19kg CO₂eq
+
+//          1인당 연간 사용하는 일회용 플라스틱 제품(11.8kg)의 제조에서 약 50kg CO₂eq, 폐기 소각에서 약 19kg CO₂eq가 발생하여, 총 약 69kg CO₂eq가 배출된다.
             const { slope, intercept } = linearRegression(years, values);
 
             const forecastYears = [];
@@ -245,7 +260,7 @@
                 actionsByYear[y] = peopleThisYear * actionsPerPersonPerYear;
                 totalReduceActions += actionsByYear[y];
 
-                // 누적 CO2 흡수량
+                // 누적 CO2 감소량
                 let reducedThisYear = 0;
                 for (let actionedYear = 2023; actionedYear <= y; actionedYear++) reducedThisYear += actionsByYear[actionedYear] * reductionPerAction;
                 totalReduceCO2 = reducedThisYear;
