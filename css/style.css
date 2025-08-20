@@ -1,0 +1,480 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard Variable', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    color: #374151;
+    overflow-x: hidden;
+    position: relative;
+    padding: 30px 0;
+}
+
+:root {
+    --vh: 1vh;
+    --primary-green: #059669;
+    --light-green: #ecfdf5;
+    --border-color: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+/* 메인 컨테이너 */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 25px;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.title h1 {
+    font-size: 2.2rem;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.title h1::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--primary-green);
+    border-radius: 2px;
+}
+
+.title p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 데스크톱 그리드 */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* 모바일 스와이프 컨테이너 */
+.swipe-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: none;
+    min-height: 500px;
+    margin: 20px 0;
+}
+
+.swipe-wrapper {
+    display: flex;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.swipe-slide {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0 15px;
+    display: flex;
+    align-items: stretch;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 15px;
+}
+
+.pagination-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination-dot.active {
+    background: var(--primary-green);
+    transform: scale(1.3);
+}
+
+/* 스와이프 인디케이터 */
+.swipe-indicator {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    animation: fadeInOut 4s ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes fadeInOut {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    10%,
+    90% {
+        opacity: 1;
+    }
+}
+
+/* 카드 스타일 */
+.card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    aspect-ratio: 1 / 1.2;
+    min-height: 0;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+.card-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* 탭 스타일 */
+.tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 20px;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 6px;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.tab {
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    position: relative;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.tab.active {
+    background: white;
+    color: var(--primary-green);
+    border: 1px solid var(--primary-green);
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+    font-weight: 600;
+}
+
+.tab:hover:not(.active) {
+    background: rgba(5, 150, 105, 0.05);
+    color: var(--primary-green);
+}
+
+/* 차트 컨테이너 */
+.chart-container {
+    flex: 1;
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #f3f4f6;
+    margin: 10px 0;
+    z-index: 1;
+    min-height: 0;
+}
+
+.chart-container canvas {
+    max-height: 100% !important;
+}
+
+/* 통계 박스 */
+.stats-box {
+    background: var(--light-green);
+    border: 1px solid #d1fae5;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+.stats-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.stats-item:last-child {
+    margin-bottom: 0;
+}
+
+.stats-value {
+    font-weight: 600;
+    color: var(--primary-green);
+}
+
+/* 모바일 스타일 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px 0;
+    }
+
+    .swipe-container {
+        display: block;
+    }
+
+    .grid {
+        display: none;
+    }
+
+    .card {
+        height: 100%;
+        min-height: 460px;
+        max-height: calc(100vh - 160px);
+        aspect-ratio: unset;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .container {
+        padding: 0 15px;
+        margin: 0 auto;
+    }
+
+    .title {
+        margin-bottom: 20px;
+    }
+
+    .title h1 {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+    }
+
+    .title p {
+        font-size: 0.9rem;
+    }
+
+    .card-header {
+        margin-bottom: 15px;
+    }
+
+    .card-icon {
+        font-size: 28px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .tabs {
+        margin-bottom: 15px;
+        z-index: 10;
+    }
+
+    .tab {
+        font-size: 0.75rem;
+        min-height: 40px;
+        padding: 10px 6px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .pagination {
+        margin-top: 10px;
+        padding: 10px;
+    }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1023px) {
+    body {
+        padding: 25px 0;
+    }
+
+    .swipe-container {
+        display: none;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0;
+    }
+
+    .tab {
+        flex: 1;
+    }
+
+    .card {
+        aspect-ratio: 1 / 1.15;
+        padding: 25px;
+    }
+
+    .title h1 {
+        font-size: 2.5rem;
+    }
+
+    .title p {
+        font-size: 1.15rem;
+    }
+}
+
+/* 데스크톱 */
+@media (min-width: 1024px) {
+    body {
+        padding: 40px 0;
+    }
+
+    .swipe-container {
+        display: none;
+    }
+
+    .grid {
+        display: grid;
+        gap: 35px;
+    }
+
+    .container {
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+
+    .title {
+        margin-bottom: 60px;
+    }
+
+    .title h1 {
+        font-size: 3.2rem;
+    }
+
+    .title p {
+        font-size: 1.3rem;
+    }
+
+    .card {
+        padding: 35px;
+        aspect-ratio: 1 / 1.1;
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+    }
+
+    .card-icon {
+        font-size: 52px;
+    }
+
+    .chart-container {
+        min-height: 280px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 25px;
+    }
+
+    .tab {
+        flex: 1;
+        min-height: auto;
+        padding: 16px 12px;
+        font-size: 0.9rem;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+    }
+}
