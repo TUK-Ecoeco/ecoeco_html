@@ -107,37 +107,43 @@ function initChart(chartId, data, color, label) {
     return chart;
 }
 
-// 차트 업데이트 함수
+function animateYAxis(chart, targetMax, duration = 1000) {
+    const startMax = chart.options.scales.y.max || 0;
+    const startTime = performance.now();
+
+    function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 0.5 - Math.cos(progress * Math.PI) / 2; // easeInOut
+        chart.options.scales.y.max = startMax + (targetMax - startMax) * eased;
+        chart.update('none'); // 데이터는 그대로, 스케일만 애니메이션
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+
 function updateChart(chartType, scale, isMobile = false) {
     const chartData = data[chartType][scale];
     const chartObj = isMobile ? mobileCharts[chartType] : charts[chartType];
-
     if (!chartObj) return;
 
+    // 데이터 업데이트
     chartObj.data.datasets[0].data = chartData.values;
-    chartObj.update('active');
 
-    // 통계 업데이트
-    const suffix = isMobile ? 'Mobile' : '';
-    if (chartType === 'co2') {
-        const totalEl = document.getElementById('co2Total' + suffix);
-        const monthlyEl = document.getElementById('co2Monthly' + suffix);
-        if (totalEl) totalEl.textContent = chartData.total;
-        if (monthlyEl) monthlyEl.textContent = chartData.monthly;
-    } else if (chartType === 'carbon') {
-        const totalEl = document.getElementById('carbonTotal' + suffix);
-        const compareEl = document.getElementById('carbonMonthly' + suffix);
-        if (totalEl) totalEl.textContent = chartData.total;
-        if (compareEl) compareEl.textContent = chartData.monthly;
-    } else if (chartType === 'energy') {
-        const totalEl = document.getElementById('energyTotal' + suffix);
-        const renewableEl = document.getElementById('energyMonthly' + suffix);
-        if (totalEl) totalEl.textContent = chartData.total;
-        if (renewableEl) renewableEl.textContent = chartData.monthly;
-    } else if (chartType === 'water') {
-        const totalEl = document.getElementById('waterTotal' + suffix);
-        const dailyEl = document.getElementById('waterMonthly' + suffix);
-        if (totalEl) totalEl.textContent = chartData.total;
-        if (dailyEl) dailyEl.textContent = chartData.monthly;
-    }
+    // 새로운 Y축 최대값
+    const newMax = Math.max(...chartData.values) * 1.3;
+
+    // Y축 부드럽게 애니메이션
+    animateYAxis(chartObj, newMax, 1500);
+
+    // 데이터 포인트는 Chart.js 기본 애니메이션으로
+    chartObj.update();
+
+    // 숫자 카운트 애니메이션
+    animateNumber(`#${chartType}Total${isMobile ? 'Mobile' : ''}`, chartData.total);
+    animateNumber(`#${chartType}Monthly${isMobile ? 'Mobile' : ''}`, chartData.monthly);
 }
+
+
+
+
