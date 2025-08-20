@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <title>환경 데이터 대시보드</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>환경 영향도 시각화</h1>
+            <p>개인부터 국가 단위까지 환경 데이터를 한눈에</p>
+        </div>
+
+        <!-- 모바일 스와이프 컨테이너 -->
+        <div class="swipe-container">
+            <div class="swipe-wrapper" id="swipeWrapper">
+
+                <!-- 이산화탄소 배출량 카드 -->
+                <div class="swipe-slide">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon"><img width="50" height="50" src="https://img.icons8.com/ios/50/co2.png" alt="co2" /></span>
+                            <h3 class="card-title">이산화탄소 배출량</h3>
+                            <p class="card-subtitle">CO₂ Emissions (kg/year)</p>
+                        </div>
+                        <div class="tabs">
+                            <div class="tab active" data-card="co2" data-scale="1">1인</div>
+                            <div class="tab" data-card="co2" data-scale="100">100인</div>
+                            <div class="tab" data-card="co2" data-scale="10000">10,000인</div>
+                            <div class="tab" data-card="co2" data-scale="korea">한국 전체</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="co2ChartMobile"></canvas>
+                        </div>
+                        <div class="stats-box">
+                            <div class="stats-item">
+                                <span>연간 총량:</span>
+                                <span class="stats-value" id="co2TotalMobile">4,500kg</span>
+                            </div>
+                            <div class="stats-item">
+                                <span>월평균:</span>
+                                <span class="stats-value" id="co2MonthlyMobile">375kg</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탄소발자국 카드 -->
+                <div class="swipe-slide">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon"><img width="48" height="48" src="https://img.icons8.com/parakeet-line/48/baby-feet.png" alt="baby-feet" /></span>
+                            <h3 class="card-title">탄소발자국</h3>
+                            <p class="card-subtitle">Carbon Footprint (tCO₂eq/year)</p>
+                        </div>
+                        <div class="tabs">
+                            <div class="tab active" data-card="carbon" data-scale="1">1인</div>
+                            <div class="tab" data-card="carbon" data-scale="100">100인</div>
+                            <div class="tab" data-card="carbon" data-scale="10000">10,000인</div>
+                            <div class="tab" data-card="carbon" data-scale="korea">한국 전체</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="carbonChartMobile"></canvas>
+                        </div>
+                        <div class="stats-box">
+                            <div class="stats-item">
+                                <span>연간 총량:</span>
+                                <span class="stats-value" id="carbonTotalMobile">12.5t</span>
+                            </div>
+                            <div class="stats-item">
+                                <span>세계 평균 대비:</span>
+                                <span class="stats-value" id="carbonCompareMobile">+23%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 에너지 소비량 카드 -->
+                <div class="swipe-slide">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon"><img width="50" height="50" src="https://img.icons8.com/ios/50/flash-on.png" alt="flash-on" /></span>
+                            <h3 class="card-title">에너지 소비량</h3>
+                            <p class="card-subtitle">Energy Consumption (MWh/year)</p>
+                        </div>
+                        <div class="tabs">
+                            <div class="tab active" data-card="energy" data-scale="1">1인</div>
+                            <div class="tab" data-card="energy" data-scale="100">100인</div>
+                            <div class="tab" data-card="energy" data-scale="10000">10,000인</div>
+                            <div class="tab" data-card="energy" data-scale="korea">한국 전체</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="energyChartMobile"></canvas>
+                        </div>
+                        <div class="stats-box">
+                            <div class="stats-item">
+                                <span>연간 총량:</span>
+                                <span class="stats-value" id="energyTotalMobile">8.2 MWh</span>
+                            </div>
+                            <div class="stats-item">
+                                <span>재생에너지 비율:</span>
+                                <span class="stats-value" id="renewableRatioMobile">6.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 물 사용량 카드 -->
+                <div class="swipe-slide">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon"><img width="42" height="42" src="https://img.icons8.com/fluency-systems-regular/48/water.png" alt="water" /></span>
+                            <h3 class="card-title">물 사용량</h3>
+                            <p class="card-subtitle">Water Usage (m³/year)</p>
+                        </div>
+                        <div class="tabs">
+                            <div class="tab active" data-card="water" data-scale="1">1인</div>
+                            <div class="tab" data-card="water" data-scale="100">100인</div>
+                            <div class="tab" data-card="water" data-scale="10000">10,000인</div>
+                            <div class="tab" data-card="water" data-scale="korea">한국 전체</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="waterChartMobile"></canvas>
+                        </div>
+                        <div class="stats-box">
+                            <div class="stats-item">
+                                <span>연간 총량:</span>
+                                <span class="stats-value" id="waterTotalMobile">186 m³</span>
+                            </div>
+                            <div class="stats-item">
+                                <span>일평균:</span>
+                                <span class="stats-value" id="waterDailyMobile">510L</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination" id="pagination">
+                <div class="pagination-dot active" data-slide="0"></div>
+                <div class="pagination-dot" data-slide="1"></div>
+                <div class="pagination-dot" data-slide="2"></div>
+                <div class="pagination-dot" data-slide="3"></div>
+            </div>
+
+            <!-- 스와이프 인디케이터 -->
+            <div class="swipe-indicator">← 좌우로 스와이프하세요 →</div>
+        </div>
+
+        <!-- 데스크톱/태블릿 그리드 -->
+        <div class="grid">
+
+            <!-- 이산화탄소 배출량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon"><img width="50" height="50" src="https://img.icons8.com/ios/50/co2.png" alt="co2" /></span>
+                    <h3 class="card-title">이산화탄소 배출량</h3>
+                    <p class="card-subtitle">CO₂ Emissions (kg/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="co2" data-scale="1">1인</div>
+                    <div class="tab" data-card="co2" data-scale="100">100인</div>
+                    <div class="tab" data-card="co2" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="co2" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="co2Chart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="co2Total">12,304.4 kg</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>월평균:</span>
+                        <span class="stats-value" id="co2Monthly">1,025.4 kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탄소발자국 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon"><img width="48" height="48" src="https://img.icons8.com/parakeet-line/48/baby-feet.png" alt="baby-feet" /></span>
+                    <h3 class="card-title">탄소발자국</h3>
+                    <p class="card-subtitle">Carbon Footprint (kgCO₂eq/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="carbon" data-scale="1">1인</div>
+                    <div class="tab" data-card="carbon" data-scale="100">100인</div>
+                    <div class="tab" data-card="carbon" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="carbon" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="carbonChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="carbonTotal">14,017 kg</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>월평균:</span>
+                        <span class="stats-value" id="carbonMonthly">1,168 kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 에너지 소비량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon"><img width="50" height="50" src="https://img.icons8.com/ios/50/flash-on.png" alt="flash-on" /></span>
+                    <h3 class="card-title">에너지 소비량</h3>
+                    <p class="card-subtitle">Energy Consumption (kWh/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="energy" data-scale="1">1인</div>
+                    <div class="tab" data-card="energy" data-scale="100">100인</div>
+                    <div class="tab" data-card="energy" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="energy" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="energyChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="energyTotal">10,637 kWh</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>월평균:</span>
+                        <span class="stats-value" id="energyMonthly">886.5 kWh</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 물 사용량 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon"><img width="42" height="42" src="https://img.icons8.com/fluency-systems-regular/48/water.png" alt="water" /></span>
+                    <h3 class="card-title">물 사용량</h3>
+                    <p class="card-subtitle">Water Usage (L/year)</p>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-card="water" data-scale="1">1인</div>
+                    <div class="tab" data-card="water" data-scale="100">100인</div>
+                    <div class="tab" data-card="water" data-scale="10000">10,000인</div>
+                    <div class="tab" data-card="water" data-scale="korea">한국 전체</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="waterChart"></canvas>
+                </div>
+                <div class="stats-box">
+                    <div class="stats-item">
+                        <span>연간 총량:</span>
+                        <span class="stats-value" id="waterTotal">110,960 L</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>월평균:</span>
+                        <span class="stats-value" id="waterMonthly">9246.7 L</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 데이터 -->
+    <script src="js/data.js"></script>
+
+    <!-- 차트 -->
+    <script src="js/chart.js"></script>
+
+    <!-- 스와이프 -->
+    <script src="js/swipe.js"></script>
+
+    <!-- 초기화 -->
+    <script src="js/init.js"></script>
+</body>
+
+</html>
